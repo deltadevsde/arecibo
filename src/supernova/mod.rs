@@ -79,7 +79,7 @@ impl<E: Engine> CircuitDigests<E> {
 }
 
 /// A vector of [`R1CSWithArity`] adjoined to a set of [`PublicParams`]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(bound = "")]
 pub struct PublicParams<E1>
 where
@@ -102,6 +102,27 @@ where
   /// Digest constructed from this `PublicParams`' parameters
   #[serde(skip, default = "OnceCell::new")]
   digest: OnceCell<E1::Scalar>,
+}
+
+impl<E1> PublicParams<E1>
+where
+  E1: CurveCycleEquipped,
+{
+  pub fn primary_params(&self) -> &SuperNovaAugmentedCircuitParams {
+    &self.augmented_circuit_params_primary
+  }
+
+  pub fn secondary_params(&self) -> &SuperNovaAugmentedCircuitParams {
+    &self.augmented_circuit_params_secondary
+  }
+
+  pub fn primary_circuit_consts(&self) -> &ROConstantsCircuit<Dual<E1>> {
+    &self.ro_consts_circuit_primary
+  }
+
+  pub fn secondary_circuit_consts(&self) -> &ROConstantsCircuit<E1> {
+    &self.ro_consts_circuit_secondary
+  }
 }
 
 /// Auxiliary [`PublicParams`] information about the commitment keys and
